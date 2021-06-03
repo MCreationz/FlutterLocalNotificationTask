@@ -3,8 +3,8 @@ import 'package:hive/hive.dart';
 
 class AppDatabase {
 
-Box getSavedTasks(){
+/*Box getSavedTasks(){
   return Hive.box(TASK_LIST_KEY) ;
-}
-
+}*/
+Box get getSavedTasks =>Hive.box(TASK_LIST_KEY) ;
 }

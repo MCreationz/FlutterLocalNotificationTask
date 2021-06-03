@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_task_manager/utils/progress_dialog.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 mixin BaseClass {
@@ -130,27 +131,14 @@ mixin BaseClass {
     }
   }
 
-/*  String getDateTime(int timestamp) {
-    if (timestamp == null) return "";
+   void showCircularDialog(BuildContext context) {
+    showDialog(
 
-    var date =
-        DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: false);
-    String formattedTime = DateFormat('Hm').format(date);
-    String formattedDate = DateFormat('MMMM dd, yyyy').format(date);
-    return (formattedDate + " " + formattedTime);
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) => ProgressDialog(),
+    );
   }
-
-  Future<bool> isInternetConnected() async {
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (!(connectivityResult == ConnectivityResult.mobile ||
-        connectivityResult == ConnectivityResult.wifi)) {
-      return false;
-    } else {
-      return true;
-    }
-  }*/
-
-
 
 
   Future<bool> checkInternet() async {

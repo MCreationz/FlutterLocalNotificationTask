@@ -6,8 +6,9 @@ import 'package:flutter_task_manager/widgets/task_widget.dart';
 import 'package:hive/hive.dart';
 
 class CompletedTaskPage extends StatelessWidget {
- //final Box taskBox = Hive.box(TASK_LIST_KEY);
-final AppDatabase _appDatabase = AppDatabase();
+  //final Box taskBox = Hive.box(TASK_LIST_KEY);
+  final AppDatabase _appDatabase = AppDatabase();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,20 +19,24 @@ final AppDatabase _appDatabase = AppDatabase();
       ),
       body: ListView.builder(
         shrinkWrap: true,
-        itemCount: _appDatabase.getSavedTasks().length,
+        itemCount: _appDatabase.getSavedTasks.length,
         itemBuilder: (BuildContext context, int index) {
-          final taskModel = _appDatabase.getSavedTasks().get(index) as TaskListModel;
+          final taskModel = _appDatabase.getSavedTasks.get(index) as TaskListModel;
           return taskModel.isCompleted
-              ? TaskWidget(
-                  tasks: taskModel,
-                  onEditClick: (TaskListModel taskListModel) {},
-                  onCompletedClick: (TaskListModel taskListModel) {},
-                  isTrailing: false,
-                  isCompletedScreen: true,
-                )
+              ? _getCompletedTasksWidget(taskModel)
               : Container();
         },
       ),
+    );
+  }
+
+  Widget _getCompletedTasksWidget(TaskListModel taskModel) {
+    return TaskWidget(
+      tasks: taskModel,
+      onEditClick: (TaskListModel taskListModel) {},
+      onCompletedClick: (TaskListModel taskListModel) {},
+      isTrailing: false,
+      isCompletedScreen: true,
     );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_task_manager/database/app_db.dart';
 import 'package:flutter_task_manager/models/task_list_model.dart';
 import 'package:flutter_task_manager/services/local_notification_handler/localNotificationsHandler.dart';
 import 'package:flutter_task_manager/ui/add_tasks/add_task_page.dart';
@@ -24,17 +25,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with BaseClass {
   final taskBox = Hive.box(TASK_LIST_KEY);
-
+  AppDatabase _appDatabase;
   final TextEditingController _textEditingController = TextEditingController();
 
   final FocusNode focusNode = FocusNode();
-
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+     _appDatabase = AppDatabase();
   }
 
   @override
@@ -62,28 +62,34 @@ class _HomePageState extends State<HomePage> with BaseClass {
         ],
       ),
       body: ValueListenableBuilder(
-          valueListenable: Hive.box(TASK_LIST_KEY).listenable(),
+          valueListenable: /*Hive.box(TASK_LIST_KEY)*/_appDatabase.getSavedTasks.listenable(),
           builder: (context, box, widget) {
             return ListView.builder(
               shrinkWrap: true,
-              itemCount: taskBox.length,
+              itemCount: _appDatabase.getSavedTasks.length,
               itemBuilder: (BuildContext context, int index) {
-                final taskModel = taskBox.get(index) as TaskListModel;
+                final taskModel = _appDatabase.getSavedTasks.get(index) as TaskListModel;
                 return !taskModel.isCompleted
                     ? TaskWidget(
                         tasks: taskModel,
                         onEditClick: (TaskListModel taskListModel) {
                           pushToNextScreenWithAnimation(
-                              context: context,
-                              destination:
-                                  AddTaskPage(true, taskListModel, index));
+                            context: context,
+                            destination:
+                                AddTaskPage(true, taskListModel, index),
+                          );
                         },
                         onCompletedClick: (TaskListModel taskListModel) async {
+                          showCircularDialog(context);
                           LocationData locationData =
                               await UserCurrentLocation().getUserLocation();
                           if (locationData != null) {
+                            popToPreviousScreen(context: context);
                             _completeTaskBottomSheet(
                                 context, taskListModel, index, locationData);
+                          }
+                          else{
+                            popToPreviousScreen(context: context);
                           }
                         },
                         isTrailing: true,
@@ -94,6 +100,8 @@ class _HomePageState extends State<HomePage> with BaseClass {
           }),
     );
   }
+
+
 
   void _completeTaskBottomSheet(BuildContext context,
       TaskListModel taskListModel, int index, LocationData locationData) {
@@ -186,7 +194,7 @@ class _HomePageState extends State<HomePage> with BaseClass {
                                           locationData.longitude.toString(),
                                       completedNoteLocationName: "",
                                     );
-                                    taskBox.put(index, mData);
+                                    _appDatabase.getSavedTasks.put(index, mData);
 
                                     popToPreviousScreen(context: context);
                                   },

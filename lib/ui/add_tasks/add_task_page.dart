@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_task_manager/date_controller/date_controller.dart';
 import 'package:flutter_task_manager/models/task_list_model.dart';
 import 'package:flutter_task_manager/services/local_notification_handler/localNotificationsHandler.dart';
 import 'package:flutter_task_manager/utils/app_constants.dart';
+import 'package:flutter_task_manager/utils/app_strings.dart';
 import 'package:flutter_task_manager/utils/baseClass.dart';
 import 'package:flutter_task_manager/widgets/form_input.dart';
 import 'package:flutter_task_manager/widgets/rounded_edge_button.dart';
@@ -24,11 +26,8 @@ class _AddTaskPageState extends State<AddTaskPage> with BaseClass{
 
   String _selectedDateTime ;
   final FocusNode _taskNode = FocusNode();
-
   final TextEditingController _taskController = TextEditingController();
-
   final FocusNode _taskTimeNode = FocusNode();
-
   final TextEditingController _taskTimeController = TextEditingController();
 
 
@@ -46,18 +45,19 @@ class _AddTaskPageState extends State<AddTaskPage> with BaseClass{
   }
   @override
   Widget build(BuildContext context) {
+  DateController dateController = Get.put(DateController());
     NotificationService notificationService = Get.put(NotificationService());
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.redAccent,
-        title: Text(widget.isEdit?'Edit task':'Add task'),
+        title: Text(widget.isEdit?EDIT_TASK:ADD_TASK),
       ),
       body: Container(
         padding: EdgeInsets.only(left: 20, right: 20, top: 50),
         child: ListView(
           children: [
             FormInput(
-                label: 'Task Name',
+                label: TASK_NAME,
                 textEditingController: _taskController,
                 focusNode: _taskNode,
                 maxLine: 8),
@@ -66,10 +66,11 @@ class _AddTaskPageState extends State<AddTaskPage> with BaseClass{
             ),
             GestureDetector(
               onTap: () {
+                removeFocusFromEditText(context: context);
                 _showDatePicker(context);
               },
               child: FormInput(
-                label: 'Task Date and Time',
+                label: TASK_DATE_TIME,
                 textEditingController: _taskTimeController,
                 focusNode: _taskTimeNode,
                 isEnabled: false,
@@ -83,14 +84,14 @@ class _AddTaskPageState extends State<AddTaskPage> with BaseClass{
                 buttonRadius: 15,
                 color: Colors.redAccent,
                 textColor: Colors.white,
-                text: widget.isEdit?'Edit Task':'Add Task',
+                text: widget.isEdit?EDIT_TASK:ADD_TASK,
                 onPressed: (value) {
                   if(_taskController.text.trim().isEmpty){
-                    Get.snackbar("ERROR", "Task name cannot be empty",backgroundColor: Colors.amber);
+                    Get.snackbar(ERROR, ERROR_TASK_NAME_EMPTY,backgroundColor: Colors.amber);
 
                   }
                   else if(_taskTimeController.text.trim().isEmpty){
-                    Get.snackbar("ERROR", "Task date and time cannot be empty",backgroundColor: Colors.amber);
+                    Get.snackbar(ERROR, ERROR_TASK_DATE_TIME_EMPTY,backgroundColor: Colors.amber);
                     return ;
                   }
                   else {
@@ -156,7 +157,7 @@ class _AddTaskPageState extends State<AddTaskPage> with BaseClass{
 
                   // Close the modal
                   CupertinoButton(
-                    child: Text('OK'),
+                    child: Text(OK),
                     onPressed: () {
                       popToPreviousScreen(context: context);
                     }
